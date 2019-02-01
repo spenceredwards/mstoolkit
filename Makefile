@@ -39,34 +39,35 @@ RELVER = $(SOVER).0.1
 
 AR_CFLAGS = -O3 -static -I. -I$(HEADER_PATH) -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DGCC -DHAVE_EXPAT_CONFIG_H
 SO_CFLAGS = -O3 -shared -fPIC -g -I. -I$(HEADER_PATH) -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DGCC -DHAVE_EXPAT_CONFIG_H
-LIBS = -lm -lpthread -ldl
-CLEAN_LIBS = libmstoolkitlite.a libmstoolkitlite.so libmstoolkitlite.so.$(SOVER)* libmstoolkit.a libmstoolkit.so libmstoolkit.so.$(SOVER)*
+LIBS = -lm -lpthread
+CLEAN_LIBS = libmstoolkitlite.lib libmstoolkitlite.dll libmstoolkitlite.dll.$(SOVER)* libmstoolkit.lib libmstoolkit.dll libmstoolkit.dll.$(SOVER)*
 
 all: 
 	make arlib 
 	make solib
+	
 
 .PHONY: objects
 objects: $(ZLIB) $(MZPARSER) $(MZPARSERLITE) $(MZIMLTOOLS) $(MSTOOLKIT) $(READER) $(READERLITE) $(EXPAT) $(SQLITE)
 
 arlib: CFLAGS = $(AR_CFLAGS)
 arlib: clean_objects objects
-	ar rcs libmstoolkitlite.a $(ZLIB) $(EXPAT) $(MZIMLTOOLS) $(MZPARSERLITE) $(MSTOOLKIT) $(READERLITE)
-	ar rcs libmstoolkit.a $(ZLIB) $(EXPAT) $(MZIMLTOOLS) $(MZPARSER) $(MSTOOLKIT) $(READER) $(SQLITE)
+	ar rcs libmstoolkitlite.lib $(ZLIB) $(EXPAT) $(MZIMLTOOLS) $(MZPARSERLITE) $(MSTOOLKIT) $(READERLITE)
+	ar rcs libmstoolkit.lib $(ZLIB) $(EXPAT) $(MZIMLTOOLS) $(MZPARSER) $(MSTOOLKIT) $(READER) $(SQLITE)
 #	$(CC) $(CFLAGS) MSTDemo.cpp -L. -lmstoolkitlite -o MSTDemo
-	$(CC) $(CFLAGS) -I./include MSSingleScan/MSSingleScan.cpp -L. -lmstoolkitlite -o msSingleScan
+	$(CC) $(CFLAGS) -I./include MSSingleScan/MSSingleScan.cpp -L. -llibmstoolkitlite -o msSingleScan
 #	$(CC) $(CFLAGS) MSConvertFile.cpp -L. -lmstoolkitlite -o MSConvertFile
 
 solib: CFLAGS = $(SO_CFLAGS)
 solib: clean_objects objects 
-	$(CC) $(CFLAGS) -o libmstoolkitlite.so.$(RELVER) -Wl,-z,relro -Wl,-soname,libmstoolkitlite.so.$(SOVER) $(LIBS) $(ZLIB) $(EXPAT) $(MZIMLTOOLS) $(MZPARSERLITE) $(MSTOOLKIT) $(READERLITE)
-	ln -sf libmstoolkitlite.so.$(RELVER) libmstoolkitlite.so.$(SOVER)
-	ln -sf libmstoolkitlite.so.$(SOVER) libmstoolkitlite.so
-	$(CC) $(CFLAGS) -o libmstoolkit.so.$(RELVER) -Wl,-z,relro -Wl,-soname,libmstoolkit.so.$(SOVER) $(LIBS) $(ZLIB) $(EXPAT) $(MZIMLTOOLS) $(MZPARSER) $(MSTOOLKIT) $(READER) $(SQLITE)
-	ln -sf libmstoolkit.so.$(RELVER) libmstoolkit.so.$(SOVER)
-	ln -sf libmstoolkit.so.$(SOVER) libmstoolkit.so
+	$(CC) $(CFLAGS) -o libmstoolkitlite.dll.$(RELVER) -Wl,-soname,libmstoolkitlite.dll.$(SOVER) $(LIBS) $(ZLIB) $(EXPAT) $(MZIMLTOOLS) $(MZPARSERLITE) $(MSTOOLKIT) $(READERLITE)
+	ln -sf libmstoolkitlite.dll.$(RELVER) libmstoolkitlite.dll.$(SOVER)
+	ln -sf libmstoolkitlite.dll.$(SOVER) libmstoolkitlite.dll
+	$(CC) $(CFLAGS) -o libmstoolkit.dll.$(RELVER) -Wl,-soname,libmstoolkit.dll.$(SOVER) $(LIBS) $(ZLIB) $(EXPAT) $(MZIMLTOOLS) $(MZPARSER) $(MSTOOLKIT) $(READER) $(SQLITE)
+	ln -sf libmstoolkit.dll.$(RELVER) libmstoolkit.dll.$(SOVER)
+	ln -sf libmstoolkit.dll.$(SOVER) libmstoolkit.dll
 	# Be careful not to include in the linker command line below the compilation -shared -fPIC flags!
-	$(CC) -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DGCC -DHAVE_EXPAT_CONFIG_H -I./include -L. MSSingleScan/MSSingleScan.cpp -lmstoolkitlite -o msSingleScan.shared 
+	$(CC) -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DGCC -DHAVE_EXPAT_CONFIG_H -I./include -L. MSSingleScan/MSSingleScan.cpp -lmstoolkitlite -o msSingleScan.exe 
 
 clean_objects: 
 	rm -f *.o msSingleScan.*
